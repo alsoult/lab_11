@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercise_1</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap");
+      img {
+        width: 52px;
+        height: 52px;
+      }
+      table {
+        margin: 30px;
+        width: 800px;
+        border-collapse: collapse;
+        border-radius: 8px;
+        background-color: rgba(218, 218, 218, 60%);
+        color: rgba(18, 18, 18, 95%);
+        font-family: "Ubuntu", sans-serif;
+        font-size: 18px;
+      }
+      th {
+        background-color: rgba(218, 218, 218, 60%);
+        padding: 15px;
+        border: 3px solid #cfcfcf;
+        border-top: none;
+        border-bottom-width: 5px;
+      }
+      th:first-child {
+        border-top-left-radius: 8px;
+        border-left: none;
+      }
+      th:last-child {
+        border-top-right-radius: 8px;
+        border-right: none;
+      }
+      td {
+        padding: 15px;
+        text-align: center;
+        border: 3px solid #cfcfcf;
+        border-bottom: none;
+      }
+      td:first-child {
+        border-left: none;
+      }
+      td:last-child {
+        border-right: none;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <th>Флаг страны</th>
+        <th>Название страны</th>
+        <th>Наименование валюты на английском языке</th>
+        <th>Наименование валюты на белорусском языке</th>
+        <th id="add-date">Курс валюты к белорусскому рублю на</th>
+      </tr>
+      <tr>
+        <td><img src="img/georgia.png" alt="Georgia" /></td>
+        <td>Грузия</td>
+        <td id="cur_eng_name"></td>
+        <td id="cur_bel_name"></td>
+        <td id="current_rate"></td>
+      </tr>
+    </table>
+    <script>
+      const date = new Date();
+      document.getElementById("add-date").innerHTML +=
+        " " +
+        date.getDate() +
+        "." +
+        (date.getMonth() + 1) +
+        "." +
+        date.getFullYear();
+
+      const request_Name = new XMLHttpRequest();
+      const request_Rate = new XMLHttpRequest();
+
+      function request_NameReadyStateChange() {
+        if (request_Name.readyState == 4 && request_Name.status == 200) {
+          document.getElementById("cur_eng_name").innerHTML = JSON.parse(
+            request_Name.responseText
+          ).Cur_Name_Eng;
+          document.getElementById("cur_bel_name").innerHTML = JSON.parse(
+            request_Name.responseText
+          ).Cur_Name_Bel;
+        }
+      }
+      function request_RateReadyStateChange() {
+        if (request_Rate.readyState == 4 && request_Rate.status == 200) {
+          document.getElementById("current_rate").innerHTML =
+            JSON.parse(request_Rate.responseText).Cur_OfficialRate /
+            JSON.parse(request_Rate.responseText).Cur_Scale;
+        }
+      }
+
+      request_Name.open("GET", "https://api.nbrb.by/exrates/currencies/46");
+      request_Name.onreadystatechange = request_NameReadyStateChange;
+      request_Name.send();
+
+      request_Rate.open(
+        "GET",
+        "https://api.nbrb.by/exrates/rates/481?periodicity=1"
+      );
+      request_Rate.onreadystatechange = request_RateReadyStateChange;
+      request_Rate.send();
+    </script>
+  </body>
+</html>
